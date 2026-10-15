@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check round 26 record/image/gallery structure offline, not visual fidelity."""
+"""Check round 27 record/image/gallery structure offline, not visual fidelity."""
 import hashlib
 from html.parser import HTMLParser
 import json
@@ -61,21 +61,21 @@ def jpeg_dimensions(raw):
 
 
 def main():
-    wall = Path('artifacts/gathering/wall-v6.png').read_bytes()
+    wall = Path('artifacts/gathering/wall-v7.png').read_bytes()
     assert wall == Path('artifacts/gathering/wall.png').read_bytes()
     assert png_dimensions(wall) == (1254, 1254)
-    jpeg = Path('dist/gathering/26.jpg').read_bytes()
+    jpeg = Path('dist/gathering/27.jpg').read_bytes()
     assert jpeg_dimensions(jpeg) == (512, 512)
     assert len(jpeg) < 100000
     digest = hashlib.sha256(wall).hexdigest()
-    record = json.loads(Path('dist/gathering/26.json').read_text())
+    record = json.loads(Path('dist/gathering/27.json').read_text())
     assert set(record) == {'name', 'image', 'attributes'}
     assert record['image'] == 'https://api.imd.fun/artifacts/' + digest
     attrs = {a['trait_type']: a['value'] for a in record['attributes']}
     assert len(attrs) == len(record['attributes']) == 6
     assert set(attrs) == {'Cave', 'Wall', 'Number', 'Left behind', 'Meaning', 'One thing'}
     assert attrs['Cave'] == 'Ice' and attrs['Wall'] == 'Gathering'
-    assert type(attrs['Number']) is int and attrs['Number'] == 26
+    assert type(attrs['Number']) is int and attrs['Number'] == 27
     assert attrs['One thing'] == 'Gathering'
     assert json.loads(Path('dist/goals.json').read_text()) == [
         {'line': n, 'goal': Path(f'line-{n}/GOAL.md').read_text().strip()} for n in range(1, 5)]
@@ -84,9 +84,9 @@ def main():
     content = Path('dist/index.html').read_text()
     gallery = Gallery(content)
     assert len(content.encode()) < 100000
-    assert len(gallery.records) == len(expected) == 130
+    assert len(gallery.records) == len(expected) == 135
     assert set(gallery.records) == expected
-    assert len(gallery.images) == 30
+    assert len(gallery.images) == 35
     assert all(re.fullmatch(r'data:image/jpeg;base64,[A-Za-z0-9+/=]+', src) for src in gallery.images)
     assert not set(gallery.tags) & {'script', 'iframe', 'link'}
     for href in gallery.links:
@@ -110,20 +110,22 @@ def main():
         ('line-3/tools/import-map/import_map.py', 'shared/import-drift/import_map.py'),
         ('line-2/tools/csv-reconcile/reconcile.py', 'shared/import-drift/reconcile.py'),
         ('line-4/tools/abi-workbench/abi_workbench.py', 'shared/token-read-plan/abi_workbench.py'),
-        ('line-2/tools/csv-patch/patch.py', 'shared/import-drift/patch.py')]:
+        ('line-2/tools/csv-patch/patch.py', 'shared/import-drift/patch.py'),
+        ('line-1/tools/cache-lens/cache_lens.py', 'shared/http-evidence/cache_lens.py'),
+        ('line-2/tools/csv-reconcile/reconcile.py', 'shared/http-evidence/reconcile.py')]:
         assert Path(source).read_bytes() == Path(reused).read_bytes()
     audit_source = Path('line-2/tools/csv-key-audit/audit.py').read_text().replace(
         "sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'csv-reconcile'))\n", '')
     assert audit_source == Path('shared/import-drift/audit.py').read_text()
-    image_review = json.loads(Path('gathering/image-checks26.json').read_text())
+    image_review = json.loads(Path('gathering/image-checks27.json').read_text())
     assert image_review['png']['sha256'] == digest
     assert image_review['preservation']['outside_rectangle_changed_pixels'] == 0
     assert image_review['preservation']['changed_pixels'] > 0
-    assert json.loads(Path('gathering/test-runs26.json').read_text())['ok']
-    assert json.loads(Path('gathering/integration-checks26.json').read_text())['ok']
+    assert json.loads(Path('gathering/test-runs27.json').read_text())['ok']
+    assert json.loads(Path('gathering/integration-checks27.json').read_text())['ok']
     print(json.dumps({'ok': True, 'png': {'dimensions': [1254, 1254], 'format': 'PNG', 'sha256': digest, 'bytes': len(wall)},
                       'jpeg': {'dimensions': [512, 512], 'bytes': len(jpeg)},
-                      'gallery_records': 130, 'painted_previews': 30, 'placeholders': 100,
+                      'gallery_records': 135, 'painted_previews': 35, 'placeholders': 100,
                       'gallery_bytes': len(content.encode()),
                       'visual_certification': False}, indent=2))
 

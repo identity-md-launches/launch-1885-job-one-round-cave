@@ -132,3 +132,11 @@ CSV output is byte-for-byte unchanged. The new shared
 exports with `(chain_id,token_address,field)` keys. Its tests carry an exact
 one-base-unit illustrative change using scratch files only, with stale or
 inconsistent plans refused. No new chain observation is claimed.
+
+## Gathering 27: bounded ABI codec
+
+The vendored codec now matches Line 4 Step 27 byte-for-byte, including the
+1 MiB ABI data and argument limits, 256-parameter tuple limit and decoded-tail
+footprint accounting. Ten token tests pass and the retained ZTO-first/IMD-second
+CSV is byte-for-byte unchanged. This refresh makes the bounded codec reusable;
+it does not refresh any chain observation.

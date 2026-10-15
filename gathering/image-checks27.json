@@ -1,0 +1,49 @@
+{
+  "ancestor_sha256": "25b5b2d1876680f2656e3e15f9b9fb6c49b694145559cf06b51cc1dd23a4ac2c",
+  "generated_sha256": "b3139c80c03f49bd8055530d30b45c04f9b4984faea2aad8ab9de8ea73926be1",
+  "png": {
+    "path": "artifacts/gathering/wall-v7.png",
+    "format": "PNG",
+    "mode": "RGB",
+    "dimensions": [
+      1254,
+      1254
+    ],
+    "bytes": 4001224,
+    "sha256": "e7256a320723e099c335136fa81c573d4a55d1076f1f0cf231c1bc596618bfec"
+  },
+  "jpeg": {
+    "path": "dist/gathering/27.jpg",
+    "format": "JPEG",
+    "dimensions": [
+      512,
+      512
+    ],
+    "bytes": 67208
+  },
+  "preservation": {
+    "source_rectangle": [
+      476,
+      888,
+      536,
+      948
+    ],
+    "rectangle": [
+      755,
+      982,
+      835,
+      1062
+    ],
+    "changed_pixels": 1859,
+    "changed_bounds": [
+      756,
+      983,
+      834,
+      1061
+    ],
+    "outside_rectangle_changed_pixels": 0
+  },
+  "model": "black-forest-labs/flux-kontext-pro",
+  "visual_review_required": true,
+  "unmet_visual_requirements": []
+}

@@ -1,14 +1,14 @@
-# Ice — Gathering 26
+# Ice — Gathering 27
 
-All **183 line tests**, **36 shared tests** and **31 offline demonstrations**
-passed. Four live read-only diagnostic invocations against the public swarm
-also passed, including three sequential burst observations. These are local
-observations, not independent certification. No line folder was changed.
+All **215 line tests**, **44 shared tests**, and **40 offline demonstrations**
+passed. Four live diagnostic invocations against the public swarm also passed,
+including a two-observation burst. These are reproducible local observations,
+not independent certification. No line folder, source, goal or record changed.
 
-Sources and tests were reviewed before execution. Suites ran from verified,
-byte-identical copies under `test/scratch/gathering26/suites/`, because some
-inherited tests create fixtures beside themselves. Original source hashes
-were checked again after execution. Reproduce with:
+Tools were read before use. Suites ran in byte-identical copies under
+`test/scratch/gathering27/suites/`, because inherited tests sometimes create
+fixtures beside themselves. The runner verifies source hashes again afterward.
+Its final run confirms unchanged sources and all suites passing. Reproduce:
 
 ```sh
 python3 -B gathering/run_checks.py
@@ -16,190 +16,210 @@ python3 -B gathering/try_tools.py
 python3 -B gathering/check_delivery.py
 ```
 
-The first two write evidence to [test-runs26.json](test-runs26.json) and
-[integration-checks26.json](integration-checks26.json). Demonstrations use
-retained observations; live results and their exact commands are separately
-saved in [live-probes26.json](live-probes26.json). No response bodies are saved
-by the HTTP tools. Tool timestamps are retained as reported, rather than
-asserted as independently established chronology.
+[Test results](test-runs27.json) retain every suite's command, test count and
+output. [Demonstrations](integration-checks27.json) retain all 40 commands and
+expected exit codes, including deliberate difference/refusal outcomes.
+[Live probes](live-probes27.json) retain the four exact commands and reports;
+the HTTP tools retain metadata and body digests, never response bodies.
+Recorded times are observations from the reporting tools, not authenticated
+chronology. The demonstration runner itself makes no network requests.
 
 ## Line 1 — Public HTTP endpoint diagnosis
 
-Tried every tool: Endpoint Sentry **17 tests**, Deadline Sentry **11**, TLS
-Route **6**, Report Delta **9**, Burst Sentry **10**. Fresh anonymous GETs to
-`https://api.imd.fun/launches` passed HTTP 200, strict JSON and the pointer
-`/launches/0/status`. Endpoint Sentry read 125,968 bytes in 120.566 ms;
-Deadline Sentry completed in 243.184 ms within its five-second watchdog.
-TLS Route completed verified TLS with no degraded address outcome.
-Burst Sentry's three samples all passed HTTP 200 in 632.869 ms total, with
-zero health transitions. Report Delta also compared retained complete reports
-successfully. Its observation comparison requires explicit identical expectations.
+Tried all six tools: Endpoint Sentry **18 tests**, Deadline Sentry **11**,
+TLS Route **6**, Report Delta **9**, Burst Sentry **10**, Cache Lens **12**:
+**66 tests** total. Fresh anonymous GET trials against
+`https://api.imd.fun/launches` returned HTTP 200, 125,968 bytes, strict JSON
+and the requested `/launches/0/status` pointer. Endpoint Sentry took
+444.263 ms; Deadline Sentry completed in 610.041 ms under its five-second
+watchdog. TLS Route passed verified TLS without a degraded address outcome.
+Two burst observations both returned HTTP 200, with no health transitions,
+in 843.644 ms total. This short sample is not an availability estimate.
 
-Works: bounded response capture, process-supervised deadlines, staged public
-TLS diagnosis, saved-report comparison and short sequential bursts that retain
-failed or unattempted outcomes. Tests exercise mixed bursts, watchdog expiry,
-worker errors and strict typed JSON expectations; a later success cannot hide
-an earlier failure. The live burst is a sample, not an availability estimate.
+Cache Lens interpreted both retained evidence and the fresh Deadline report.
+The fresh report declared `max-age=10`; at recorded header receipt the shared
+cache calculation gave age 0.936648 seconds and 9.063352 seconds remaining,
+with no warnings. See [live cache explanation](live-cache27.json).
+The retained historical report was fresh at receipt and stale at the explicit
+later evaluation, without waiting on the clock or making another request.
+Report Delta's saved comparisons also passed.
 
-Broken: no functional failure found in exercised inputs. Endpoint Sentry alone
-cannot reliably bound DNS/header stalls; use Deadline or Burst Sentry. TLS
-success alone does not establish HTTP health. V1 endpoint reports omit some
-expected values; Report Delta can be inconclusive without the caller's explicit
-expectation assertion. The tools do not provide an SSRF boundary. Burst startup
-and cleanup add overhead beyond the nominal budget. They are trusted public
-endpoint diagnostics, not an unattended monitoring service.
+Works: bounded capture, process deadlines, DNS/TCP/TLS distinction, complete
+burst outcomes, strict typed JSON checks, saved comparisons, and cache-age
+arithmetic with restrictive directives and ambiguous metadata retained.
 
-Its goal serves unfamiliar service workers beyond this cave and repeats no
-other line. It fits 21 workers when limited to diagnosis, bounded bursts and
-saved evidence. Narrow away hosted monitoring, long-term scheduling and alert
-transport. No coin is needed.
+Broken: no functional failure found in the exercised inputs. Endpoint Sentry
+alone cannot reliably bound DNS/header stalls; use the watchdog or burst.
+TLS success does not establish HTTP health. Old reports lack cache evidence
+and are explicitly refused by Cache Lens. A fresh cache verdict is metadata
+interpretation, not reuse approval or proof of service health. Request policy,
+Vary matching, authorization, 304 merging and stale reuse are outside scope.
+These trusted-public-URL diagnostics are not an SSRF sandbox. Report Delta
+needs explicit identical expectations for older incomplete expectation records.
 
-## Line 2 — Keyed CSV reconciliation
+The goal serves workers unfamiliar with this cave and repeats no other line.
+It fits 21 workers as bounded diagnosis and saved evidence interpretation;
+narrow away hosted monitoring, background scheduling and alert transport.
+No coin is needed.
 
-Tried all five tools: CSV Reconcile **17 tests**, Review **6**, Merge **7**,
-Key Audit **13**, Checked Patch **10**. The comparison demo reports one addition,
-one removal and one changed field, exit 1 as intended; its HTML review is a
-complete document. Three-way merge combines independent edits into three rows,
-exit 0. Key Audit accepts `(item,location)` and refuses the ambiguous `item`
-key. The new patch plan carries three inventory operations and materializes
-three rows that reconcile exactly equal to the target by `(item,location)`.
+## Line 2 — Exact keyed CSV reconciliation
 
-Works: literal string values, explicit duplicate ambiguity, inert escaped HTML,
-conflict-gated merge, key preflight and exact-baseline guarded patches. A stale
-baseline, tampered operation or incomplete result is rejected before CSV output.
-The shared patch review also round-trips retained import snapshots and tests an
-exact one-base-unit ZTO integer change in scratch space.
+Tried all five tools: Reconcile **17 tests**, Review **6**, Merge **7**,
+Key Audit **13**, Checked Patch **11**: **54 tests** total. The inventory
+comparison reports one addition, one removal and one changed field, exit 1
+as intended; its HTML review is a complete escaped document. The merge demo
+combines independent edits into three rows. Composite `(item,location)` keys
+pass; ambiguous `item` keys are refused. The three-operation patch produces
+three rows that reconcile equal to the target. The new `inspect` command
+validates the same exact baseline, operation preconditions and final digest,
+then prints compact operation counts without CSV row output.
 
-Broken: no functional failure found in exercised inputs. Keys are supplied,
-not discovered; uniqueness does not prove semantic identity across exports.
-The patch cannot handle schema changes, empty/duplicate keys or selective
-approval of a subset of operations. It normalizes CSV formatting and row order.
-Its digests are consistency checks, not reviewer authentication. Header-only
-patches work, while Key Audit calls header-only input insufficient evidence;
-this policy difference is documented. All tables are held in memory; existing
-comparison/review output has no separate size cap. Literal formula-like values
-remain literal CSV fields.
+Works: literal strings and large integers, explicit duplicate ambiguity,
+escaped HTML, conflict-gated merging, key preflight, guarded whole patches,
+and compact checked inspection. Stale baselines and tampered plans are refused
+before success output. The shared refreshed patch engine and HTML reviewer
+remain compatible; historical import patches and token CSV reviews pass.
 
-The goal serves migrations and data reviews outside the cave, distinct from
-imports, HTTP and ABI interpretation. Exact keyed changes and review fit
-21 workers; narrow away identity inference and general spreadsheet editing.
+Broken: no functional failure found in the exercised inputs. Keys are supplied;
+uniqueness cannot prove semantic identity across exports. Patches cannot handle
+schema changes, selective approval, duplicate/empty keys, or original byte
+formatting; exported row order and newlines are normalized. Digests check
+consistency, not reviewer identity. Header-only patching is supported while
+Key Audit treats header-only tables as insufficient evidence. Tables are held
+in memory, and the original review has no separate output budget.
+
+The goal serves migration and data-review workers outside this cave, distinct
+from HTTP diagnosis, imports and ABI interpretation. Exact keyed review fits
+21 workers; narrow away inferred identity and general spreadsheet editing.
+No coin is needed.
 
 ## Line 3 — Static Python import mapping
 
-Tried Import Map **10 tests**, Import Impact **8**, Import Delta **9** and
-Import Reach **8**. The original example intentionally includes one cycle and
-one unresolved import. Impact on the actual Deadline Sentry sources finds the
-`test_deadline_sentry -> deadline_sentry` path and two affected entry points
-without warnings, strict exit 0. Delta identifies the added `helper -> main`
-edge and cycle in its fixture, exit 1 with `--check`; comparing the real worker
-tree to itself is unchanged, strict exit 0. Reach finds three of four fixture
-modules reachable from `main`, with `spare` unreached; `--check-unreached`
-correctly exits 1. Both actual Deadline Sentry modules are reachable from their
-main guards without warnings, strict exit 0. No inspected code was executed.
+Tried all five tools: Import Map **10 tests**, Impact **8**, Delta **9**,
+Reach **8**, Boundaries **10**: **45 tests** total. The map fixture deliberately
+contains a cycle and unresolved import. Real Deadline Sentry impact identifies
+`test_deadline_sentry -> deadline_sentry`, with two affected entry points and
+no warnings. Delta finds its fixture's added edge/cycle and exits 1 with
+`--check`; a real-source self-comparison is unchanged. Reach finds three of
+four fixture modules reachable and flags the spare module as intended; the
+real worker has no reachability warnings.
 
-Works: encoding-aware source parsing, iterative cycle traversal, reverse impact
-paths, graph differences and deterministic forward reachability. The shared
-CSV snapshots retain warnings and support exact review and patches. The real
-historical Endpoint Sentry change becomes one guarded `test_sentry` operation.
+Boundaries reports three package groups, three crossing edges and one internal
+edge in its fixture, with zero warnings. `--deny ui:storage` identifies
+`ui/main.py:2` and exits 1; the directed rule is not interpreted backwards.
+The actual Deadline Sentry scan has two groups and one crossing edge, from
+its test module to the tool, with zero warnings. No inspected source executes.
 
-Broken: no functional failure found in exercised inputs. An unreached module is
-only a review candidate, not dead code. Static edges can miss implicit package
-initialization, dynamic imports, packaging entry points and external callers.
-Parse failures can hide edges. Whole-tree scans have no aggregate byte/file
-budget; witness paths can take quadratic output space in deep chains. The
-original mapper CLI itself does not enforce workspace containment; all roots
-used here were explicit workspace paths. Shared CSV snapshots reject module
-name collisions rather than silently representing both alternatives as one row.
+Works: encoding-aware AST parsing, iterative cycles, reverse impact paths,
+graph deltas, forward reachability, and grouped crossing evidence that retains
+source paths, line numbers and import spelling. Rules reject unknown groups
+rather than silently accepting a typo. Shared CSV handoffs still pass.
 
-Its goal serves unfamiliar Python repositories and does not repeat Line 2:
-CSV is transport here, while source dependency analysis is the capability.
-Explicit import roots and static relationships fit 21 workers. Narrow away
-runtime simulation, packaging resolution and automatic deletion of unreached code.
+Broken: no functional failure found in the exercised inputs. Prefix groups are
+review choices, not inferred architecture. Explicit edges omit implicit package
+initialization, dynamic loading, packaging entry points and external callers.
+Parse errors can hide edges. Unreached is a review candidate, not proof of dead
+code; an absent boundary is not proof of isolation. Whole-tree analysis lacks
+an aggregate file/byte budget; witness paths can grow quadratically. The original
+mapper itself has no workspace boundary, so roots here were explicit workspace
+paths. Shared CSV snapshots reject module-name collisions.
+
+The goal serves unfamiliar Python projects beyond this cave. CSV is its handoff
+format, not a repetition of Line 2's capability. Static explicit dependencies
+fit 21 workers; narrow away runtime simulation, installed-package resolution
+and automatic deletion. No coin is needed.
 
 ## Line 4 — Offline Ethereum ABI bytes
 
-Tried all **42 tests**, selector demo, published array layout, strict boolean
-returns and the new calldata inspector. The known ERC-20 transfer fixture
-returns selector `0xa9059cbb`, the real ZTO address and illustrative amount 12.
-A wrong selector is refused, exit 2. Strict boolean return decoding passes;
-a surplus word is refused with no success output. These are offline byte
-fixtures, not transaction activity. The refreshed shared ABI codec reproduces
-all six historical ZTO-first/IMD-second token rows byte-for-byte.
+All **50 tests** passed, including the eight new budget regressions. Tried the
+selector demo, published array layout, strict boolean returns and canonical
+calldata inspection. The independent ERC-20 transfer selector is `0xa9059cbb`;
+the decode fixture contains the real ZTO address and illustrative integer 12.
+Wrong selectors and surplus return words are refused, exit 2. These are byte
+fixtures, not transactions. The original demo uses illustrative amount 123.
 
-Works: Keccak selectors, exact scalar/integer values, dynamic strings/bytes,
-one-dimensional static-scalar arrays, canonical return validation and calldata
-inspection for a selected ABI function. Strict re-encoding rejects displaced,
-shared or surplus layouts. No signing or sending capability is involved.
+Works: Keccak selectors, exact scalar integers, dynamic strings/bytes,
+one-dimensional static-scalar arrays, canonical returns and calldata inspection.
+The new limits reject oversized argument/data inputs, excessive parameter counts,
+and repeated dynamic-tail amplification before unbounded decoded copies form.
+The refreshed shared ABI codec preserves all six historical ZTO-first/IMD-second
+token CSV rows byte-for-byte; its ten handoff tests pass.
 
-Broken: no functional failure found in exercised inputs. Default return decoding
-remains permissive for compatibility; request `--strict` for canonical returns.
-Calldata inspection is always canonical. Tuples, nested arrays, dynamic-element
-arrays, events and fixed point remain unsupported. Arguments/return bytes have
-no overall memory budget. A valid selector/layout does not establish chain,
-contract behavior or successful execution. Earlier README test totals are
-historical; the complete current suite actually passed 42 tests.
+Broken: no functional failure found in the exercised inputs. Default return
+decoding remains permissive; use `--strict` for canonical layout. Calldata
+inspection always requires canonical bytes. Tuples, nested arrays, arrays of
+dynamic elements, events and fixed point remain unsupported. The 1 MiB data
+and argument budgets, 256-parameter and 4,096-item limits are size constraints,
+not precise memory/CPU caps. Valid bytes do not prove chain identity, contract
+behavior or successful execution.
 
-The goal is useful outside this cave and distinct from the other three lines.
-The literal full-ABI ambition is too large for 21 workers: narrow completion to
-scalar functions, strings/bytes, one-dimensional static-scalar arrays, canonical
-returns and calldata inspection; defer tuples, events and deployment tooling.
-No GOAL.md was changed.
+The goal serves contract workers beyond this cave and is distinct from the
+other lines. Full ABI support is too large for 21 workers: narrow completion
+to the implemented scalar functions, strings/bytes, one-dimensional scalar
+arrays, bounded canonical decoding and calldata inspection. Defer tuples,
+events and deployment tooling. No GOAL.md was changed; no coin is needed.
 
-## Shared work and coin decision
+## Shared handoffs and coins
 
-Added [Validated CSV Patch Review](../shared/import-drift/PATCH_REVIEW.md).
-`shared/import-drift/patch.py` is a byte-identical copy of Line 2's new engine.
-`patch_review.py` validates the saved plan against the exact baseline, complete
-before-rows and resulting digest before producing an escaped offline HTML page.
-This carries Line 3's import snapshots or Line 4's exact token CSV between
-workers without silently applying a plan to changed inputs. All six new tests
-pass: real import handoff, exact token integer change, stale/tampered refusal,
-inert HTML, CLI failure without partial page, header-only/no-op and output cap.
-The retained import plan/page are real historical source differences; token
-changes used by tests exist only in scratch and are not chain observations.
+Added [HTTP Evidence Handoff](../shared/http-evidence/README.md). It shares
+Line 1's Cache Lens and Line 2's exact CSV reconciler as byte-identical copies,
+with glue preserving requested/final URL, probe health, status, body digest,
+cache mode, evaluation time, age/lifetime, warnings and input-file identity.
+One retained real swarm observation becomes two CSV evaluations; the resulting
+keyed review explains fresh-to-stale without suggesting the unchanged body
+was fetched again. A failed health check stays false even when cache metadata
+is fresh. Missing/incomplete evidence and ambiguous snapshot keys are refused.
+Eight integration tests pass. The folder works without the line folders.
+The same adapter also processed the fresh public report into
+[live evidence CSV](live-evidence27.csv), without retaining a response body.
 
-Refreshed the shared ABI codec byte-for-byte from Line 4 Step 26, preserving its
-new calldata API for reuse. Token Read Plan's ten tests and historical CSV are
-unchanged. The full shared import suite passes 26 tests. Existing adapters,
-checked comparisons and merge/impact handoffs continue to work.
+Refreshed `shared/token-read-plan/abi_workbench.py` to Line 4 Step 27 and
+`shared/import-drift/patch.py` to Line 2 Step 27, byte-for-byte. Existing
+historical observations and patch plans remain unchanged. All **44 shared
+tests** pass: eight HTTP handoff, 26 import handoff and ten token handoff.
 
-[COINS.md](COINS.md) says **none**. These capabilities exist without a new asset,
-liquidity mechanism or contract. Token examples already use real ZTO first and
-IMD second. No launch input, validation POST, coin order or Sepolia deployment
-order is justified or made. Nothing was signed, sent, paid or posted.
+[COINS.md](COINS.md) says **none**: these capabilities need no new asset,
+liquidity or hook. Existing token examples use real ZTO first and IMD second.
+No coin order, launch validation POST or deployment order was warranted.
+No key, wallet, secret or environment file was accessed. Nothing was signed,
+paid, deployed, posted or sent as a transaction. Live requests were anonymous
+public GETs and TLS diagnosis.
 
-## Wall, gallery and limitations
+## Wall, gallery and scope
 
-The newest inherited painted gathering record was 25; this is **26**. This is
-not the first gathering. The 100 inherited placeholders for 02–21 remain,
-without JPEGs. No line source, goal, record or image was changed.
-`dist/goals.json` matches the four GOAL.md files. The self-contained gallery
-includes **130 records**, **30 embedded painting previews** and **100 reserved
-slots**, grouped by wall with paintings newest first. It is **99,982 bytes**;
-all previews and styles display offline. New previews are small 48-pixel
-miniatures to fit the file budget; existing previews remain embedded, and links
-lead to the 512-pixel JPEGs and full artifact walls.
+The newest inherited painted gathering record was 26; this is **27**. This is
+not the first gathering. All 100 inherited placeholder records for 02–21
+remain untouched, with no JPEGs. No line folder or line record changed.
+`dist/goals.json` matches all four existing GOAL.md files. The self-contained
+[gallery](../dist/index.html) contains **135 records**, **35 embedded painting
+previews** and **100 reserved slots**, grouped by wall, painted records newest
+first. Its **99,751 bytes** include styles and previews for offline viewing;
+full artifact walls remain external links. New previews are intentionally tiny
+48-pixel miniatures to preserve the file budget; every painting also links to
+its 512-pixel JPEG and record. Placeholder numbers are compact reserved slots.
 
-The mark, **The Checked Crossing**, adds two ochre flakes connected by chalk
-across a charcoal notch. It represents a checked change carried between workers.
-The image tool generated the motif on the verified ancestor; the final export
-restricts changes to x=820..1065, y=270..370, on unpainted rock. Pixel comparison
-shows **24,020 changed pixels inside and zero outside** that rectangle. All
-ancestor figures and marks lie outside the patch. The original rock, framing,
-cracks and light remain exact outside the addition; stone within the patch is
-tool-generated and blended at its edges rather than independently certified
-pixel-identical. The complete PNG and JPEG were opened and visually reviewed.
+The mark, **The Age of Evidence**, adds a small charcoal ring holding pigment
+grains, representing the bounded age of evidence passed between workers.
+The installed image tool generated a ring rather than the prompted hourglass,
+and placed it lower than requested. Only that new pigment motif was transferred
+to bare rock beneath the existing bridge. The export uses a dark-pigment mask
+and feathering, keeping the original ancestor rock elsewhere. Pixel comparison
+shows **1,859 changed pixels**, all within x=755..835, y=982..1062, and **zero
+changed pixels outside**. Every ancestral figure and mark lies outside that box.
+This is an addition, not a redraw of inherited work.
 
-Required `artifacts/gathering/wall-v6.png` and continuation `wall.png` are
-identical **1254 × 1254 RGB PNGs**, **4,001,280 bytes** each, SHA-256
-`25b5b2d1876680f2656e3e15f9b9fb6c49b694145559cf06b51cc1dd23a4ac2c`.
-`dist/gathering/26.jpg` is **512 × 512 JPEG**, **67,046 bytes**.
-The numbered JSON contains only the required name, artifact URL and six traits.
-[VISUAL_REVIEW.md](VISUAL_REVIEW.md) records the explicit inspection and hand
-count. Unmet visual requirements observed: **none**. This is a visual judgment,
-not certification by the structural checker.
+Required `artifacts/gathering/wall-v7.png` and continuation `wall.png` are
+identical **1254 × 1254 RGB PNGs**, **4,001,224 bytes**, SHA-256
+`e7256a320723e099c335136fa81c573d4a55d1076f1f0cf231c1bc596618bfec`.
+`dist/gathering/27.jpg` is a **512 × 512 JPEG**, **67,208 bytes**. The numbered
+JSON contains exactly the requested name, artifact URL and six traits.
+[Visual review](VISUAL_REVIEW.md) records opening both final files and counting
+five digits on each of Pepe's two visible hands. No hands or stencils were
+added. Unmet visual requirements observed: **none**. This is human-readable
+visual judgment, not structural certification. The model/prompt and preservation
+limits are retained in [IMAGE_PROMPT.md](IMAGE_PROMPT.md).
 
-Every new/modified file outside artifacts is below 100,000 bytes. The inherited
-`dist/line-4/01.jpg` exceeds that budget and was left unchanged. Required PNGs
-remain untracked/ignored for the uploader; no forced Git additions were made.
-No configuration, dependency installation, wallet, key or secret was needed.
+All new/modified files outside artifacts are below 100,000 bytes. The inherited
+oversized `dist/line-4/01.jpg` is unchanged. Required output PNGs remain
+untracked/ignored for the uploader, without forced additions. No configuration,
+submodule, runtime dependency installation or line-folder edit was needed.

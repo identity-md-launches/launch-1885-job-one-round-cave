@@ -16,7 +16,7 @@ import time
 
 
 def main():
-    scratch = Path('test/scratch/gathering26/suites')
+    scratch = Path('test/scratch/gathering27/suites')
     sources = sorted(Path('.').glob('line-*/tools/*/test_*.py'))
     sources += sorted(Path('shared').glob('*/test_*.py'))
     suites = sorted({p.parent for p in sources})
@@ -48,12 +48,12 @@ def main():
         results = list(pool.map(check, suites))
     for source, digest in hashes.items():
         assert hashlib.sha256(Path(source).read_bytes()).hexdigest() == digest
-    report = {'round': 26, 'source_copies_identical': True,
+    report = {'round': 27, 'source_copies_identical': True,
               'sources_unchanged_after_checks': True, 'results': results,
               'line_tests': sum(r['tests'] for r in results if r['suite'].startswith('line-')),
               'shared_tests': sum(r['tests'] for r in results if r['suite'].startswith('shared/')),
               'ok': all(r['exit_code'] == 0 for r in results)}
-    Path('gathering/test-runs26.json').write_text(json.dumps(report, indent=2) + '\n')
+    Path('gathering/test-runs27.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps({k: v for k, v in report.items() if k != 'results'}, indent=2))
     return 0 if report['ok'] else 1
 

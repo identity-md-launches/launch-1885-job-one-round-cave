@@ -67,3 +67,10 @@ claim. Keep the saved JSON and baseline immutable between review and apply.
 Static import snapshots cannot prove runtime reachability; token return bytes
 cannot prove that an RPC honored its stated chain/block. This tool preserves
 those inputs exactly rather than establishing their external truth.
+
+## Gathering 27 refresh
+
+The shared `patch.py` now matches Line 2 Step 27 byte-for-byte, including its
+`inspect` subcommand for a compact validated operation summary. Existing
+validated HTML review still performs the full baseline/precondition/result
+digest checks; its 26 shared tests pass. No source snapshot was replaced.

@@ -10,7 +10,7 @@ import subprocess
 
 
 def main():
-    scratch = Path('test/scratch/gathering26')
+    scratch = Path('test/scratch/gathering27')
     scratch.mkdir(parents=True, exist_ok=True)
     results = []
 
@@ -102,15 +102,34 @@ def main():
     import_path.write_text(import_plan)
     review = run('Shared validated patch HTML', 'shared/import-drift/patch_review.py',
         [import_base, str(import_path)], html=True)
-    Path('shared/import-drift/observed-patch26.json').write_text(import_plan)
-    Path('shared/import-drift/observed-patch26.html').write_text(review)
+    assert json.loads(Path('shared/import-drift/observed-patch26.json').read_text()) == json.loads(import_plan)
+    assert review == Path('shared/import-drift/observed-patch26.html').read_text()
     stale = scratch / 'stale.csv'
     stale.write_bytes(Path(import_base).read_bytes().replace(b'\n', b'\r\n'))
     run('Shared review refuses stale baseline', 'shared/import-drift/patch_review.py',
         [str(stale), str(import_path)], 2)
+    run('Cache Lens historical receipt', 'line-1/tools/cache-lens/cache_lens.py',
+        ['line-1/tools/cache-lens/observed-live.json', '--shared'])
+    run('Cache Lens historical expiry', 'line-1/tools/cache-lens/cache_lens.py',
+        ['line-1/tools/cache-lens/observed-live.json', '--shared', '--at', '2026-10-15T19:03:45Z'])
+    run('Import Boundaries fixture', 'line-3/tools/import-boundaries/boundaries.py',
+        ['line-3/tools/import-boundaries/examples', '--strict', '--json'])
+    run('Import Boundaries denied edge', 'line-3/tools/import-boundaries/boundaries.py',
+        ['line-3/tools/import-boundaries/examples', '--deny', 'ui:storage', '--json'], 1)
+    run('Import Boundaries real worker', 'line-3/tools/import-boundaries/boundaries.py',
+        ['line-1/tools/deadline-sentry', '--strict', '--json'])
+    run('CSV patch compact inspection', patcher, ['inspect',
+        'line-2/tools/csv-reconcile/demo-before.csv', str(plan_path)])
+    run('Shared CSV patch compact inspection', 'shared/import-drift/patch.py',
+        ['inspect', import_base, str(import_path)])
+    run('HTTP evidence receipt snapshot', 'shared/http-evidence/http_evidence.py',
+        ['snapshot', 'shared/http-evidence/observed-report.json', '--shared'])
+    run('HTTP evidence exact freshness review', 'shared/http-evidence/http_evidence.py',
+        ['compare', 'shared/http-evidence/observed-receipt.csv',
+         'shared/http-evidence/observed-expired.csv'], 1)
     report = {'ok': all(item['passed'] for item in results), 'results': results,
               'token_historical_csv_byte_identical': True}
-    Path('gathering/integration-checks26.json').write_text(json.dumps(report, indent=2) + '\n')
+    Path('gathering/integration-checks27.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps({'ok': report['ok'], 'checks': len(results),
                       'failed': [r['name'] for r in results if not r['passed']]}, indent=2))
     return 0 if report['ok'] else 1

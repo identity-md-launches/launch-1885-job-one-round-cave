@@ -1,40 +1,41 @@
-# Gathering 26 — The Checked Crossing
+# Gathering 27 — The Age of Evidence
 
-All 183 line tests, 36 shared tests and 31 offline demonstrations passed.
-Four public swarm diagnostic invocations also passed, including three burst
-samples. [REPORT.md](REPORT.md) covers each line, limitations and recommended
-21-worker scope. [COINS.md](COINS.md) says none: the work needs no new asset.
+All 215 line tests, 44 shared tests and 40 offline demonstrations passed.
+Four public swarm diagnostic invocations also passed. The
+[report](REPORT.md) covers every tool, observed failures/limits, goal overlap
+and how to keep each line achievable. [COINS.md](COINS.md) says none.
 
-The new [Validated CSV Patch Review](../shared/import-drift/PATCH_REVIEW.md)
-shares Line 2's exact-baseline patch engine with Line 3 import snapshots and
-Line 4 token CSVs. It refuses stale or inconsistent plans before rendering
-escaped, self-contained HTML. One offline command shows the retained real
-Endpoint Sentry import change:
+The new [HTTP Evidence Handoff](../shared/http-evidence/README.md) carries
+Line 1's saved HTTP health and cache-age evidence into Line 2's exact CSV
+comparisons. It retains failed health checks and explicit evaluation times.
+One command shows a retained real response becoming stale without a new GET:
 
 ```sh
-python3 -B shared/import-drift/patch_review.py shared/import-drift/observed-sentry.csv shared/import-drift/observed-patch26.json
+python3 -B shared/http-evidence/http_evidence.py compare shared/http-evidence/observed-receipt.csv shared/http-evidence/observed-expired.csv
 ```
 
-Observed exit 0: one changed `test_sentry` row and validated baseline/result
-fingerprints. No Python source is executed or changed. Six new tests cover
-real import and token handoffs, stale/tampered inputs and HTML/error behavior.
-The shared ABI codec also now matches Line 4 Step 26 byte-for-byte; historical
-ZTO-first/IMD-second CSV output remains unchanged.
+Observed exit 1 means a complete comparison found one changed URL. Its body
+and source digests stay identical. This is historical evidence, not a current
+availability or cache-reuse claim. The standalone folder uses Python's standard
+library only; its eight integration tests pass. Shared ABI and patch engines
+also now match the latest line versions byte-for-byte.
 
-[The offline gallery](../dist/index.html) contains 130 records, 30 embedded
-painting previews and 100 inherited placeholder slots. All styles/previews are
-in the single 99,982-byte page. Previews are intentionally small; each painting
-links to its 512-pixel JPEG and full artifact wall. All four goals are retained.
+The [offline gallery](../dist/index.html) includes every record: 35 embedded
+paintings and 100 inherited reserved slots, grouped by wall, newest painting
+first. The single page is 99,751 bytes. Embedded miniatures are small; each
+painting links to its 512-pixel JPEG, JSON and full artifact wall.
 
-The wall adds two ochre flakes joined across a charcoal notch, representing a
-checked change carried between workers. Required `artifacts/gathering/wall-v6.png`
-and continuation `wall.png` are identical 1254 × 1254 RGB PNGs. Its
-[record](../dist/gathering/26.json) and [512-pixel JPEG](../dist/gathering/26.jpg)
-are present. [Visual review](VISUAL_REVIEW.md) records five digits on each
-inherited visible hand and no observed unmet requirements. Zero pixels outside
-the small addition rectangle changed. Final PNG and JPEG were opened.
+The gathering mark adds a charcoal ring enclosing pigment grains beneath the
+old bridge. Required `artifacts/gathering/wall-v7.png` and continuation
+`wall.png` are identical 1254 × 1254 RGB PNGs. The
+[numbered record](../dist/gathering/27.json) and
+[512-pixel JPEG](../dist/gathering/27.jpg) are present.
+[Visual review](VISUAL_REVIEW.md) found no unmet visual requirements and counted
+five digits on each inherited hand. All pixels outside the small addition box
+are unchanged. The installed image tool and final prompt are documented in
+[IMAGE_PROMPT.md](IMAGE_PROMPT.md).
 
-Reproduce checks from the repository root, using Python's standard library:
+Reproduce checks from the repository root:
 
 ```sh
 python3 -B gathering/run_checks.py
@@ -42,15 +43,15 @@ python3 -B gathering/try_tools.py
 python3 -B gathering/check_delivery.py
 ```
 
-The suite runner checks byte-identical scratch copies to preserve line folders.
-The demonstration runner uses saved observations and writes evidence locally;
-it makes no network requests. The checker validates structure, not art quality
-or external truth. Rebuild the gallery with `python3 -B gathering/build_gallery.py`;
-missing current previews use the supplied workspace PNGs. Node and the included
-JPEG encoder are needed for those preview conversions; no package download.
-`finish_wall.js` is a one-time export that requires the verified round-25
-ancestor and refuses to run again on the completed wall.
+The first runs byte-identical scratch copies to preserve line folders. The
+second tries every tool with offline examples and retained observations.
+The third validates image bytes, record shape, gallery coverage, placeholders,
+source-copy provenance and passing evidence. It does not certify behavior or
+visual quality. Rebuild the page with `python3 -B gathering/build_gallery.py`;
+Python, Node and the included JPEG encoder suffice, without downloads. Existing
+embedded previews are retained; current missing previews use supplied PNGs.
+`finish_wall27.js` is a one-time export requiring the verified ancestor and
+model output; it intentionally refuses to rerun on the completed wall.
 
-No line folder or configuration was modified. All new/modified files outside
-artifacts are below 100 KB. The inherited oversized Line 4 record-01 JPEG is
-unchanged. Required artifact PNGs remain untracked/ignored for upload.
+No line folder or configuration changed. New and modified files outside
+artifacts remain below 100 KB. Output PNGs are left untracked for the uploader.
