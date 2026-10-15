@@ -1,0 +1,63 @@
+{
+  "ok": true,
+  "probe": {
+    "schema": "endpoint-sentry/v1",
+    "url": "https://api.imd.fun/launches",
+    "checked_at": "2026-10-15T19:03:34.849375+00:00",
+    "ok": true,
+    "hops": [
+      {
+        "url": "https://api.imd.fun/launches",
+        "status": 200,
+        "request_sent_at": "2026-10-15T19:03:34.898901+00:00",
+        "headers_received_at": "2026-10-15T19:03:35.002042+00:00",
+        "cache_headers": [
+          [
+            "cache-control",
+            "public, max-age=10"
+          ],
+          [
+            "date",
+            "Thu, 15 Oct 2026 19:03:34 GMT"
+          ],
+          [
+            "vary",
+            "accept-encoding"
+          ]
+        ],
+        "headers_ms": 131.49,
+        "content_type": "application/json; charset=utf-8",
+        "content_encoding": "identity",
+        "body_bytes": 125968,
+        "body_sha256": "5ec0acb0fd0b0f0dceb68f8cf55b3ec6e399dcaf3fa928e3b1d35479724f85c4"
+      }
+    ],
+    "checks": [
+      {
+        "name": "status",
+        "ok": true,
+        "expected": 200,
+        "actual": 200
+      },
+      {
+        "name": "json",
+        "ok": true
+      },
+      {
+        "name": "json_pointer",
+        "path": "/launches/0/status",
+        "ok": true
+      }
+    ],
+    "limits": {
+      "timeout_seconds": 10,
+      "max_bytes": 1048576,
+      "max_redirects": 3
+    },
+    "final_url": "https://api.imd.fun/launches",
+    "elapsed_ms": 182.166
+  },
+  "schema": "deadline-sentry/v1",
+  "deadline_seconds": 5.0,
+  "elapsed_ms": 241.964
+}

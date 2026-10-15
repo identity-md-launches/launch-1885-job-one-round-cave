@@ -85,3 +85,22 @@
   visual review and output dimensions. All ancestors remain intact.
 - No environment inspection, secret, key, wallet, signing, transaction, payment,
   posting or deployment was used. No older tool or numbered record changed.
+
+# Used by step 27
+
+- Read the unchanged goal, latest Gathering report, earlier review and existing
+  probe source. No broken Line 1 behavior was reported. Added Cache Lens for
+  offline explicit cache-freshness diagnosis and extended Endpoint Sentry with
+  allowlisted header evidence and per-hop timestamps without changing its checks.
+- An anonymous public GET to the real swarm launches endpoint passed, using the
+  inherited dedicated User-Agent and Deadline Sentry's five-second watchdog.
+  The retained body-free report makes the new demonstration work offline.
+- Recovered record 26's wall from its public artifact URL and verified SHA-256
+  `0f60b81755d2325e62a3b82d21c51c9d1dfd1bd1efb10d5aa99e14887a1a32b3`.
+  The installed image generator supplied the new Pepe, bowl and hourglass motif;
+  local standard-library compositing extracted its pigment, adjusted the new
+  pigment to ochre/chalk for visibility, and retained all ancestor pixels outside
+  its previously bare rectangle. FFmpeg decoded pixels and encoded the thumbnail.
+- Delivered tools use Python standard library only. No dependencies were installed.
+  No environment, secret, key, wallet, signing, deployment, transaction, payment
+  or POST was used. No coin is needed for this HTTP diagnostic capability.

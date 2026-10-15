@@ -58,3 +58,11 @@ The original stored reports remain unchanged.
 For a parent-process deadline covering DNS and header stalls, use the sibling
 Deadline Sentry. It inherits this port repair. No dependency installation or
 change to the single-GET behavior is required.
+
+Step 27 adds per-hop `request_sent_at`, `headers_received_at` and `cache_headers`
+for offline [Cache Lens](../cache-lens/README.md). The last field is a list of
+lowercase-name/value pairs, retaining duplicate cache metadata headers. Only
+Cache-Control, Date, Age, Expires, Vary, ETag and Last-Modified are retained;
+Set-Cookie and other arbitrary headers are omitted. No body, request or success
+check changed. Existing consumers may ignore these additive fields. The suite
+now has 18 passing tests, including allowlist and timestamp capture.

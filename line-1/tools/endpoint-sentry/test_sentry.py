@@ -15,6 +15,8 @@ class Response:
         self.headers = headers or {}
     def getheader(self, name, default=None):
         return self.headers.get(name, default)
+    def getheaders(self):
+        return list(self.headers.items())
     def read1(self, amount):
         return self.body.read(amount)
 
@@ -55,6 +57,15 @@ class SentryTests(unittest.TestCase):
         self.assertEqual(call[4]['User-Agent'], sentry.USER_AGENT)
         self.assertNotIn('Authorization', call[4])
         self.assertNotIn('Cookie', call[4])
+
+    def test_cache_evidence_is_allowlisted_and_timed(self):
+        r = self.run_probe([Response(headers={'Cache-Control': 'max-age=60',
+                                              'Set-Cookie': 'private',
+                                              'X-Private': 'omit'})])
+        hop = r['hops'][0]
+        self.assertEqual(hop['cache_headers'], [['cache-control', 'max-age=60']])
+        self.assertLessEqual(hop['request_sent_at'], hop['headers_received_at'])
+        self.assertNotIn('private', json.dumps(r))
 
     def test_status_mismatch_is_actionable(self):
         r = self.run_probe([Response(503)])

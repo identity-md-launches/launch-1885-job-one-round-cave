@@ -14,6 +14,9 @@ import urllib.parse
 
 USER_AGENT = 'Pepeolithic-Endpoint-Sentry/1.0 (public read-only diagnostics)'
 REDIRECTS = {301, 302, 303, 307, 308}
+# Deliberately omit cookies, authorization and arbitrary response headers.
+CACHE_HEADERS = {'cache-control', 'date', 'age', 'expires', 'vary',
+                 'etag', 'last-modified'}
 
 
 def https_url(value):
@@ -121,11 +124,17 @@ def probe(url, timeout=10.0, max_bytes=1048576, max_redirects=3,
                 connection.connect()
                 stage = 'headers'
                 target = urllib.parse.urlunsplit(('', '', u.path or '/', u.query, ''))
+                request_sent_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
                 connection.request('GET', target, headers={
                     'User-Agent': USER_AGENT, 'Accept': 'application/json, */*;q=0.1',
                     'Accept-Encoding': 'identity', 'Connection': 'close'})
                 response = connection.getresponse()
+                received_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
                 hop = {'url': current, 'status': response.status,
+                       'request_sent_at': request_sent_at,
+                       'headers_received_at': received_at,
+                       'cache_headers': [[key.lower(), value] for key, value in response.getheaders()
+                                         if key.lower() in CACHE_HEADERS],
                        'headers_ms': round((time.monotonic() - hop_start) * 1000, 3),
                        'content_type': response.getheader('Content-Type', ''),
                        'content_encoding': response.getheader('Content-Encoding', 'identity')}

@@ -1,0 +1,50 @@
+{
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "format": "PNG RGB",
+  "sha256": "8c3b60cd590be30d2582116cfecc465e655f3779cbe0b25c1936447d6eb69659",
+  "bytes": 3956260,
+  "addition_rectangle_xywh": [
+    835,
+    378,
+    225,
+    110
+  ],
+  "changed_pixels_inside": 6190,
+  "changed_pixels_outside": 0,
+  "ancestor_sha256": "0f60b81755d2325e62a3b82d21c51c9d1dfd1bd1efb10d5aa99e14887a1a32b3",
+  "step": 27,
+  "png_paths": [
+    "artifacts/line-1/wall-v7.png",
+    "artifacts/line-1/wall.png"
+  ],
+  "jpeg": {
+    "path": "dist/line-1/27.jpg",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "JPEG",
+    "bytes": 90010
+  },
+  "unmet_visual_requirements": [],
+  "visible_hands_or_handprints": 0,
+  "tests": {
+    "cache_lens": 12,
+    "endpoint_sentry": 18,
+    "deadline_sentry": 11,
+    "burst_sentry": 10,
+    "tls_route": 6,
+    "report_delta": 9,
+    "total": 66
+  },
+  "live": {
+    "report": "line-1/tools/cache-lens/observed-live.json",
+    "analysis": "line-1/tools/cache-lens/observed-analysis.json",
+    "status": 200,
+    "verdict": "within_freshness_lifetime"
+  },
+  "goal_changed": false
+}
