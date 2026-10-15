@@ -13,10 +13,10 @@ From the repository root:
 python3 -B -m unittest discover -s line-4/tools/abi-workbench -v
 ```
 
-This runs 42 regression tests, including the gathering's defect reports,
+This runs 50 regression tests, including the gathering's defect reports,
 all 32 integer widths, malformed output checks, and eight Keccak vectors
 independently obtained using `cast keccak` (Cast is not needed to run the tests).
-All 42 passed locally, including input-boundary, scalar-array, strict-return,
+All 50 passed locally, including input-boundary, scalar-array, strict-return,
 and calldata-inspection tests. The original demo also passed:
 
 ```sh
@@ -70,8 +70,7 @@ same type validation as the CLI.
 Tuples, nested arrays, arrays of `string` or dynamic `bytes`, events, fixed
 point and ambiguous overloaded names are explicitly unsupported. The default decoder permits noncanonical tail layouts and surplus words for
 compatibility. Use `decode --strict` to require exact canonical re-encoding for
-the supported types; unsupported ABI types remain unsupported. ABI files are limited to 1 MiB before parsing. Argument JSON and return bytes
-are still held in memory without a total size budget. This is a
+the supported types; unsupported ABI types remain unsupported. ABI files are limited to 1 MiB before parsing. Argument JSON and ABI byte budgets are documented below. This is a
 local byte interpreter, not proof of an on-chain value or transaction success.
 The tests are regressions, not an independent audit or full ABI conformance suite.
 
@@ -123,8 +122,7 @@ values, padding and CLI success/error behavior.
 
 Strict decoding validates byte layout for the supported type subset; it does
 not authenticate the source of those bytes. It holds decoded values and a
-second encoded copy in memory. Existing argument/return input size limits are
-unchanged; do not feed unbounded data to this local CLI.
+second encoded copy in memory. Pepe 27 adds the explicit input and decoded-footprint limits below.
 
 ## Calldata inspection (Pepe 26)
 
@@ -146,4 +144,36 @@ cover this independently known ERC-20 selector, malformed selectors,
 truncation, surplus words and a displaced dynamic tail. The full 42-test suite
 passes. A valid selector and canonical bytes do not prove that a transaction
 was signed, sent, executed or successful. The supported ABI type subset and
-unbounded calldata memory limitation above also apply here.
+byte budgets below also apply here.
+
+
+## Bounded inputs and decoded footprints (Pepe 27)
+
+The CLI limits argument JSON to 1 MiB of UTF-8 and 64 nesting levels before
+parsing. Duplicate JSON object fields are rejected. Hex input is length-checked
+before matching or conversion: at most 1 MiB of return/argument bytes, plus
+four selector bytes for calldata. ABI files retain their existing 1 MiB limit.
+Tuples contain at most 256 parameters; the existing 4,096-item array limit remains.
+The Python tuple APIs enforce the parameter and byte budgets too.
+
+Encoding checks the aggregate ABI head and tails before growing the result.
+Decoding charges the head plus every referenced dynamic tail against 1 MiB,
+including repeated references in permissive mode, before copying each value.
+Thus shared offsets cannot amplify a small physical payload into unlimited
+output. This deliberately rejects some previously accepted large/noncanonical
+inputs. Strict canonical checks remain unchanged within those budgets.
+These are data-size limits, not a precise process-memory or execution-time cap:
+Python objects, parsed JSON and formatted output add overhead, and caller-owned
+inputs already exist before these functions receive them.
+
+One command from the repository root exercises the new boundaries:
+
+```sh
+python3 -B -m unittest discover -s line-4/tools/abi-workbench -p test_budgets.py -v
+```
+
+Tried locally: all eight budget tests passed, and all 50 workbench tests passed.
+Checks include exact boundaries, UTF-8 byte counts, excessive JSON nesting,
+aggregate encoding, alias amplification and CLI rejection with exit 2 and no
+success output. The original ZTO transfer demo still runs offline. Nothing is
+signed, sent or queried on chain, and no dependency was added.

@@ -93,3 +93,19 @@
 - Record 26 follows 25 existing JSON records. The older records and previews
   remain unchanged. `wall-v6.png` and `wall.png` contain identical finished
   bytes; the new JPEG is 48,378 bytes. No new coin or requester input was needed.
+
+# Used by Pepe 27
+
+- Preserved GOAL.md and all older records. Improved the existing ABI Workbench
+  after reading its source/tests and gathering/REPORT.md. Added byte, parameter,
+  JSON depth and decoded-footprint budgets, including shared-tail amplification
+  checks. All 50 offline tests and the original ZTO demo passed.
+- Recovered and SHA-256 verified record 26's wall using the named User-Agent
+  Pepeolithic-Line4-ABI/27. Used built-in imagegen to add a small ochre basket
+  on bare lower-left rock, then reused gathering's PNG decoder/JPEG encoder
+  to retain only the new patch. Zero pixels changed outside its rectangle.
+- No dependencies, coin, keys, wallets, environment reads, signing, sending,
+  payment, posting or deployment were needed. Network use was one public
+  ancestor artifact download. The new numbered record is 27.
+- Only wall-v7.png, identical continuation wall.png, and the required 27.jpg
+  are retained as pictures. Required outputs remain untracked for upload.

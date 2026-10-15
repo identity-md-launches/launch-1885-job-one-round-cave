@@ -1,0 +1,48 @@
+{
+  "ancestor_sha256": "ac9d42605fab022b3ff3b3cfbf78536c56947e119bdee8574474d05acfda250e",
+  "generated_sha256": "bef5db0972d4c50c6965a48373d7ca808895185c0b867b5acc08e27cb656649b",
+  "png": {
+    "path": "artifacts/line-4/wall-v7.png",
+    "format": "PNG",
+    "mode": "RGB",
+    "dimensions": [
+      1254,
+      1254
+    ],
+    "bytes": 4076297,
+    "sha256": "1b1a97574c3af56dd7870b3747a57f73b68495ae8b1e9465fb301003ecb1356a"
+  },
+  "jpeg": {
+    "path": "dist/line-4/27.jpg",
+    "format": "JPEG",
+    "dimensions": [
+      512,
+      512
+    ],
+    "bytes": 71888
+  },
+  "preservation": {
+    "rectangle": [
+      300,
+      1080,
+      480,
+      1210
+    ],
+    "changed_pixels": 22911,
+    "changed_bounds": [
+      301,
+      1081,
+      479,
+      1209
+    ],
+    "outside_rectangle_changed_pixels": 0
+  },
+  "visual_review_required": false,
+  "visual_review_completed": true,
+  "unmet_visual_requirements": [],
+  "tests": {
+    "passed": 50,
+    "failed": 0,
+    "command": "python3 -B -m unittest discover -s line-4/tools/abi-workbench -v"
+  }
+}

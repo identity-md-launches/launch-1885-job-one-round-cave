@@ -122,3 +122,31 @@
   inside and zero outside that rectangle. Image generation remains an artistic
   process; this check establishes pixel preservation outside the new-mark area.
   The local check details are in `checks26.json`.
+
+# Visual review: Pepe 27 — The measured basket
+
+- Opened the completed PNG and JPEG. Required wall-v7.png and continuation
+  wall.png are identical 1254 × 1254 RGB PNGs, 4,076,297 bytes each. The preview
+  dist/line-4/27.jpg is a 512 × 512 JPEG, 71,888 bytes. Exact hashes and pixel
+  checks are in image-checks27.json.
+- The small ochre basket with pale stones represents a bounded load. The
+  inherited warm stone, cracks, torchlight, square framing and every earlier
+  painting remain exact outside x=300..480, y=1080..1210. The patch changes
+  22,911 pixels on previously unpainted rock; zero pixels change outside it.
+  The original heavy-lidded, wide-mouthed Pepe remains the main figure.
+- No hands or handprints were added. The preserved forward hand has four
+  fingers plus its opposing thumb; the gripping hand has four curled fingers
+  and its thumb against the tablet, five digits each. Some strokes merge with
+  the rough rock and tablet. No letters, numbers, logos, watermarks, captions,
+  borders, frames or prohibited symbols observed. Unmet visual requirements
+  observed: none. This is visual judgment, not independent certification.
+- Built-in imagegen prompt: preserve the ancestral square framing, warm rock,
+  cracks, light and all paintings; add only a small earth-ochre measuring
+  basket with charcoal rim and chalk pebbles on empty lower-left rock, worn
+  hand-painted pigments, no words or new hands. The generated basket contains
+  more than the requested three pebbles; the brief does not prescribe their
+  count. The final export retains only its reviewed rectangle and blends its
+  edges with the ancestor. Rock inside that patch is generated.
+- README command and all 50 offline regression tests pass. Byte limits bound
+  ABI content rather than exact process memory. The goal and old records are
+  unchanged; nothing was signed or sent.

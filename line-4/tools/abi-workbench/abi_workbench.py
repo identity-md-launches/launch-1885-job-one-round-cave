@@ -8,6 +8,48 @@ from pathlib import Path
 
 MAX_ABI_BYTES = 1024 * 1024
 MAX_ARRAY_ITEMS = 4096
+MAX_DATA_BYTES = 1024 * 1024
+MAX_ARGS_BYTES = 1024 * 1024
+MAX_PARAMS = 256
+
+def check_budget(size, subject):
+    if size > MAX_DATA_BYTES:
+        raise ValueError(f"{subject} exceeds the {MAX_DATA_BYTES}-byte ABI budget")
+
+def check_params(params):
+    if len(params) > MAX_PARAMS:
+        raise ValueError(f"ABI tuple exceeds {MAX_PARAMS} parameters")
+
+def parse_data(text, *, call=False):
+    # Check text length before regex matching or allocating decoded bytes.
+    if len(text) > 2 + 2 * (MAX_DATA_BYTES + (4 if call else 0)):
+        raise ValueError("--data exceeds the ABI byte budget")
+    if not re.fullmatch(r"0x(?:[0-9a-fA-F]{2})*", text):
+        raise ValueError("--data must be even-length 0x hex")
+    return bytes.fromhex(text[2:])
+
+def parse_args(text):
+    if len(text) > MAX_ARGS_BYTES or len(text.encode("utf-8")) > MAX_ARGS_BYTES:
+        raise ValueError("--args exceeds the 1 MiB UTF-8 input limit")
+    # Bound nesting independently of the interpreter's recursion setting.
+    depth, quoted, escaped = 0, False, False
+    for char in text:
+        if quoted:
+            if escaped: escaped = False
+            elif char == chr(92): escaped = True
+            elif char == '"': quoted = False
+        elif char == '"': quoted = True
+        elif char in '[{':
+            depth += 1
+            if depth > 64: raise ValueError('argument JSON nesting exceeds 64 levels')
+        elif char in ']}': depth -= 1
+    try:
+        values = json.loads(text, object_pairs_hook=unique_object)
+    except RecursionError as e:
+        raise ValueError("argument JSON nesting is too deep") from e
+    if not isinstance(values, list):
+        raise ValueError("--args must be a JSON array")
+    return values
 
 MASK = (1 << 64) - 1
 ROT = [0, 1, 62, 28, 27, 36, 44, 6, 55, 20, 3, 10, 43, 25, 39, 41, 45, 15, 21, 8, 18, 2, 61, 56, 14]
@@ -96,6 +138,8 @@ def encode_value(t, value):
     if t == 'bool':
         if not isinstance(value, bool): raise ValueError('bool argument must be true or false')
         return word(int(value))
+    if t in ('string', 'bytes') and isinstance(value, str):
+        check_budget(len(value) if t == 'string' else max(0, (len(value)-2)//2), 'dynamic value')
     if t == 'string': raw = value.encode('utf-8') if isinstance(value, str) else (_ for _ in ()).throw(ValueError('string argument must be text'))
     elif t == 'bytes':
         if not isinstance(value, str) or not re.fullmatch(r'0x(?:[0-9a-fA-F]{2})*', value): raise ValueError('bytes argument must be even-length 0x hex')
@@ -104,7 +148,8 @@ def encode_value(t, value):
         m = re.fullmatch(r'bytes([0-9]+)', t)
         if m:
             size = int(m.group(1))
-            if not isinstance(value, str) or not re.fullmatch(r'0x(?:[0-9a-fA-F]{2})*', value): raise ValueError(f'{t} argument must be 0x hex')
+            if not isinstance(value, str) or len(value) != 2 + 2*size: raise ValueError(f'{t} requires exactly {size} bytes')
+            if not re.fullmatch(r'0x(?:[0-9a-fA-F]{2})*', value): raise ValueError(f'{t} argument must be 0x hex')
             raw = bytes.fromhex(value[2:])
             if len(raw) != size: raise ValueError(f'{t} requires exactly {size} bytes')
             return raw.ljust(32, b'\0')
@@ -122,16 +167,20 @@ def encode_value(t, value):
             if not lo <= n <= hi: raise ValueError(f'{t} value is out of range')
             return word(n % (1 << 256))
         raise ValueError(f'unsupported ABI type: {t}')
+    check_budget(32 + len(raw) + (-len(raw)) % 32, 'dynamic value')
     return word(len(raw)) + raw + b'\0' * ((-len(raw)) % 32)
 
 def encode_tuple(params, values):
+    check_params(params)
     if len(params) != len(values): raise ValueError(f'expected {len(params)} arguments, received {len(values)}')
     types = [canonical(p) for p in params]
     head_size = 32 * sum(head_words(t) for t in types)
+    check_budget(head_size, 'ABI head')
     head, tail = bytearray(), bytearray()
     for t, v in zip(types, values):
         if dynamic(t):
             encoded = encode_value(t, v)
+            check_budget(head_size + len(tail) + len(encoded), 'encoded tuple')
             head.extend(word(head_size + len(tail))); tail.extend(encoded)
         else: head.extend(encode_value(t, v))
     return bytes(head + tail)
@@ -163,11 +212,16 @@ def decode_tuple(params, data, *, strict=False, kind='return'):
     Re-encoding also detects aliasing, gaps, reordered/overlapping tails and
     unused suffixes without maintaining a second set of offset rules.
     """
+    check_params(params)
+    check_budget(len(data), 'input data')
     subject = 'calldata' if kind == 'call' else 'return data'
     if len(data) % 32: raise ValueError(f'{subject} must be whole 32-byte words')
     types = [canonical(p) for p in params]
     head_size = 32 * sum(head_words(t) for t in types)
     if len(data) < head_size: raise ValueError(f'{subject} is shorter than the ABI head')
+    # Charge each referenced tail separately, including aliases in permissive mode.
+    footprint = head_size
+    check_budget(footprint, 'decoded tuple')
     out=[]; pos=0
     for i,(p,t) in enumerate(zip(params, types)):
         parts = array_parts(t)
@@ -175,6 +229,8 @@ def decode_tuple(params, data, *, strict=False, kind='return'):
             off=int.from_bytes(data[pos:pos+32],'big')
             if off < head_size or off%32 or off+32>len(data): raise ValueError(f'invalid dynamic {subject} offset')
             n=int.from_bytes(data[off:off+32],'big')
+            footprint += 32 + (32*n if parts else n + (-n) % 32)
+            check_budget(footprint, 'decoded tuple')
             if parts:
                 if n > MAX_ARRAY_ITEMS: raise ValueError(f'array exceeds {MAX_ARRAY_ITEMS} items')
                 end = off + 32 + 32*n
@@ -201,6 +257,7 @@ def decode_tuple(params, data, *, strict=False, kind='return'):
 
 def decode_call(fn, signature, data):
     """Inspect canonical calldata for one selected ABI function, without sending it."""
+    check_budget(max(0, len(data)-4), 'calldata')
     selector = keccak256(signature.encode('ascii'))[:4]
     if len(data) < 4 or data[:4] != selector:
         raise ValueError(f'calldata selector does not match {signature} (expected 0x{selector.hex()})')
@@ -256,6 +313,8 @@ def load_function(path, name):
     matches=[x for x in abi if x.get('type')=='function' and x.get('name')==name]
     if len(matches)!=1: raise ValueError(f'expected exactly one ABI function named {name!r}; found {len(matches)}')
     fn=matches[0]
+    check_params(fn.get('inputs', []))
+    check_params(fn.get('outputs', []))
     for param in fn.get('outputs', []):
         canonical(param)
     sig=fn['name']+'('+','.join(canonical(p) for p in fn.get('inputs',[]))+')'
@@ -280,19 +339,19 @@ def main():
     try:
         if a.demo: demo(); return 0
         if a.command=='encode':
-            fn,sig=load_function(a.abi,a.function); vals=json.loads(a.args)
-            if not isinstance(vals,list): raise ValueError('--args must be a JSON array')
+            vals=parse_args(a.args)
+            fn,sig=load_function(a.abi,a.function)
             selector=keccak256(sig.encode())[:4]
             payload=encode_tuple(fn.get('inputs',[]),vals)
             print(json.dumps({'signature':sig,'selector':'0x'+selector.hex(),'calldata':'0x'+(selector+payload).hex()},indent=2)); return 0
         if a.command=='decode':
             fn,sig=load_function(a.abi,a.function)
-            if not re.fullmatch(r'0x(?:[0-9a-fA-F]{2})*',a.data): raise ValueError('--data must be even-length 0x hex')
-            print(json.dumps({'signature':sig,'outputs':decode_tuple(fn.get('outputs',[]),bytes.fromhex(a.data[2:]),strict=a.strict)},indent=2)); return 0
+            data=parse_data(a.data, call=a.command=='decode-call')
+            print(json.dumps({'signature':sig,'outputs':decode_tuple(fn.get('outputs',[]),data,strict=a.strict)},indent=2)); return 0
         if a.command=='decode-call':
             fn,sig=load_function(a.abi,a.function)
-            if not re.fullmatch(r'0x(?:[0-9a-fA-F]{2})*',a.data): raise ValueError('--data must be even-length 0x hex')
-            args=decode_call(fn,sig,bytes.fromhex(a.data[2:]))
+            data=parse_data(a.data, call=a.command=='decode-call')
+            args=decode_call(fn,sig,data)
             print(json.dumps({'signature':sig,'selector':'0x'+keccak256(sig.encode('ascii'))[:4].hex(),'arguments':args},indent=2)); return 0
         ap.print_help(); return 2
     except (ValueError, KeyError, OSError) as e:
