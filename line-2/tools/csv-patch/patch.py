@@ -151,6 +151,24 @@ def apply(baseline, patch):
     return result
 
 
+def inspect(baseline, patch):
+    """Validate a patch against its exact baseline without emitting CSV bytes."""
+    result = apply(baseline, patch)
+    added = removed = changed = 0
+    for operation in patch['operations']:
+        if operation['before'] is None:
+            added += 1
+        elif operation['after'] is None:
+            removed += 1
+        else:
+            changed += 1
+    return {'format': patch['format'], 'keys': patch['keys'],
+            'baseline_sha256': patch['baseline_sha256'],
+            'result_sha256': hashlib.sha256(result).hexdigest(),
+            'operations': {'added': added, 'removed': removed, 'changed': changed,
+                           'total': len(patch['operations'])}, 'valid': True}
+
+
 def unique_object(pairs):
     result = {}
     for key, value in pairs:
@@ -170,13 +188,19 @@ def main(argv=None):
     a = commands.add_parser('apply', help='validate entire patch, then print resulting CSV')
     a.add_argument('baseline')
     a.add_argument('patch')
+    i = commands.add_parser('inspect', help='validate patch and print a safe operation summary')
+    i.add_argument('baseline')
+    i.add_argument('patch')
     args = parser.parse_args(argv)
     try:
         if args.command == 'plan':
             output = json.dumps(plan(args.before, args.after, args.key), ensure_ascii=False, indent=2) + '\n'
-        else:
+        elif args.command == 'apply':
             patch = json.loads(read_local(args.patch, MAX_PLAN_BYTES), object_pairs_hook=unique_object)
             output = apply(args.baseline, patch).decode('utf-8')
+        else:
+            patch = json.loads(read_local(args.patch, MAX_PLAN_BYTES), object_pairs_hook=unique_object)
+            output = json.dumps(inspect(args.baseline, patch), ensure_ascii=False, indent=2) + '\n'
     except (InputError, OSError, ValueError, TypeError, RecursionError) as exc:
         print(json.dumps({'error': str(exc)}), file=sys.stderr)
         return 2

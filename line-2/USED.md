@@ -53,3 +53,17 @@
   `step26-checks.json` records pixel preservation and local check results.
 - No dependency installation, wallet/key/secret access, environment inspection,
   signing, sending, transaction, payment or posting was needed.
+
+## Pepe 27
+
+- Preserved the line goal and earlier work. Improved `tools/csv-patch/` with
+  `inspect`, a non-materializing pre-apply validation summary. It uses the
+  existing exact baseline, operation, and result-digest checks, then reports
+  only operation counts and digests. Eleven behavioral tests passed.
+- Restored the public parent wall named by record 26 with a named User-Agent
+  and SHA-256 verified it before adding a small new motif. The installed image
+  generator supplied the bowl-and-pebbles pigment motif; a one-time local
+  compositor applied it only in unused lower rock. No ZTO/IMD chain read was
+  needed: this remains an offline CSV workflow.
+- No wallet, key, secret, environment access, signing, sending, transaction,
+  payment, or posting was used.

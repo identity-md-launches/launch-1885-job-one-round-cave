@@ -129,6 +129,18 @@ class PatchTests(unittest.TestCase):
         self.assertEqual(out.getvalue(), '')
         self.assertIn('duplicate JSON', err.getvalue())
 
+    def test_inspect_validates_without_emitting_csv(self):
+        a, b = self.pair()
+        plan = patch.plan(a, b, ['id'])
+        summary = patch.inspect(a, plan)
+        self.assertEqual(summary['operations'],
+                         {'added': 1, 'removed': 1, 'changed': 1, 'total': 3})
+        self.assertTrue(summary['valid'])
+        self.assertEqual(summary['result_sha256'], plan['result_sha256'])
+        a.write_text('id,v\na,edited\n')
+        with self.assertRaisesRegex(patch.InputError, 'changed since review'):
+            patch.inspect(a, plan)
+
 
 if __name__ == '__main__':
     unittest.main()

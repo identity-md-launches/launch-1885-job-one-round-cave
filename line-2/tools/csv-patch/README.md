@@ -16,6 +16,17 @@ quantity from `1` to `2`. Each operation contains complete before/after rows;
 `null` means the row is absent. The rope is unchanged and omitted. Keys are
 explicit ordered tuples of literal strings, never guessed or normalized.
 
+Before applying a reviewed plan, validate its exact baseline and receive a
+compact non-row-data summary:
+
+```sh
+python3 -B line-2/tools/csv-patch/patch.py inspect line-2/tools/csv-reconcile/demo-before.csv test/scratch/inventory-plan.json
+```
+
+`inspect` validates every operation and final digest exactly as `apply` does,
+but emits JSON counts for additions, removals, and changes instead of CSV. It
+is a final review gate, not authentication of the plan's author.
+
 To review and apply it to a **new** output file:
 
 ```sh
