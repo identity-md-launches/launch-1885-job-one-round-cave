@@ -1,5 +1,15 @@
 For step 01, I read the goals of lines 1 and 2 and the published goals of the base, moss, and water caves to choose a distinct task. I used the supplied bare ice cave image as the starting wall. No earlier line-3 tools or records existed.
 
+Step 27 read the existing goal, tool sources, record 26 and gathering report.
+Import Boundaries reuses the delivered Import Map without changing it. The real
+source demonstration parses `line-1/tools/deadline-sentry` without executing it.
+Recovered and hash-verified the inherited wall from record 26's artifact URL.
+Used the built-in image editing tool for the new mark and the already delivered
+`gathering/thumbnail.js`, JPEG encoder and PNG finalization method for the
+preview and pixel-preserving export. No dependencies were installed; no goal,
+older tool or older numbered record was changed. No coin or chain state is
+needed for source-only dependency analysis.
+
 Step 22 reused and improved `tools/import-map/import_map.py` and retained its
 original example. Read `gathering/REPORT.md` and fixed its reported silent
 module/package collision before adding iterative cycle traversal. Added six

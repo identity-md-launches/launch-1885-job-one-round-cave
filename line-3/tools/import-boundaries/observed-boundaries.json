@@ -1,0 +1,51 @@
+{
+  "depth": 1,
+  "groups": [
+    {
+      "name": "deadline_sentry",
+      "modules": [
+        "deadline_sentry"
+      ]
+    },
+    {
+      "name": "test_deadline_sentry",
+      "modules": [
+        "test_deadline_sentry"
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "from": "test_deadline_sentry",
+      "to": "deadline_sentry",
+      "denied": false,
+      "module_edge_count": 1,
+      "edges": [
+        {
+          "from": "test_deadline_sentry",
+          "to": "deadline_sentry",
+          "path": "test_deadline_sentry.py",
+          "occurrences": [
+            {
+              "line": 10,
+              "target": "deadline_sentry"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "deny_rules": [],
+  "issues": [],
+  "cycles": [],
+  "dynamic_imports": [],
+  "summary": {
+    "module_count": 2,
+    "group_count": 2,
+    "internal_edge_count": 0,
+    "crossing_edge_count": 1,
+    "boundary_count": 1,
+    "violating_edge_count": 0
+  },
+  "scope": "Explicit static local imports only; groups are dotted prefixes, not inferred architecture. Missing edges are not proof of isolation. Package initialization, dynamic imports, external callers and runtime conditions are not modeled."
+}

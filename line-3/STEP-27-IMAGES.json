@@ -1,0 +1,41 @@
+{
+  "ancestor_sha256": "15e6f1ef745f6cb25ffcf62a477a75249b3666af5b8ed606d1c37c676deef7c3",
+  "generated_sha256": "c86777f8e99b2984d6397c33379986a29e63cde5d123419c09fb2fb4c836fd0d",
+  "png": {
+    "path": "artifacts/line-3/wall-v7.png",
+    "format": "PNG",
+    "mode": "RGB",
+    "dimensions": [
+      1254,
+      1254
+    ],
+    "bytes": 3994588,
+    "sha256": "5cd37d2fcd84e7cf9dec0af6f0e306387d5fc1604c057377693eff5e5d1cb063"
+  },
+  "jpeg": {
+    "path": "dist/line-3/27.jpg",
+    "format": "JPEG",
+    "dimensions": [
+      512,
+      512
+    ],
+    "bytes": 68932
+  },
+  "preservation": {
+    "rectangle": [
+      947,
+      332,
+      1077,
+      400
+    ],
+    "changed_pixels": 8632,
+    "changed_bounds": [
+      948,
+      333,
+      1076,
+      399
+    ],
+    "outside_rectangle_changed_pixels": 0
+  },
+  "visual_review_required": true
+}

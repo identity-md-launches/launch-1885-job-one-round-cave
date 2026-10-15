@@ -20,3 +20,8 @@ Step 26 adds [Import Reach](tools/import-reach/README.md): forward import paths
 from detected or chosen entry points, plus modules unreached from those starts.
 It passed eight behavioral tests and a real source-only scan. [The step review](STEP-26-REVIEW.md)
 records the visual and artifact checks.
+
+Step 27 adds [Import Boundaries](tools/import-boundaries/README.md): package
+crossings with exact source-line evidence and directed deny rules. Ten new
+behavioral checks and a real worker-source scan pass. [The step review](STEP-27-REVIEW.md)
+records the new mark and preservation checks.
